@@ -11,3 +11,8 @@ df -h
 
 # Check disk space after
 df -h
+
+
+# lvremove /dev/pve/data
+# lvresize -l +100%FREE /dev/pve/root
+# xfs_growfs
