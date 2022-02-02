@@ -1,0 +1,32 @@
+A configuração será atualizada automaticamente, assim que o arquivo for alterado. Isso significa que as alterações que podem ser integradas em um corosync em execução entrarão em vigor imediatamente. Assim, você deve sempre fazer uma cópia e editá-la, para evitar acionar alterações não intencionais ao salvar o arquivo durante a edição:
+
+cp /etc/pve/corosync.conf /etc/pve/corosync.conf.new
+
+Em seguida, abra o arquivo de configuração:
+nano /etc/pve/corosync.conf.new
+
+O trecho a seguir deverá ser comentado com "#" ou deletado:
+#quorum {
+#  provider: corosync_votequorum
+#}
+
+O trecho a seguir deverá ser Adicionado:
+quorum {
+           provider: corosync_votequorum
+           expected_votes: 2
+           two_node: 1
+           wait_for_all: 0
+       }
+
+Depois de fazer as alterações necessárias, crie outra cópia do arquivo de configuração de trabalho atual. Isso serve como backup se a nova configuração não for aplicada ou causar outros problemas:
+cp /etc/pve/corosync.conf /etc/pve/corosync.conf.bak
+
+Finalmente substitua o arquivo de configuração antigo pelo novo:
+mv /etc/pve/corosync.conf.new /etc/pve/corosync.conf
+
+Recoimendo reiniciar o serviço corosync:
+systemctl restart corosync
+
+Você pode verificar se as alterações podem ser aplicadas corretamente, usando os seguintes comandos:
+systemctl status corosync
+journalctl -b -u corosync
