@@ -1,0 +1,28 @@
+Follow the steps below to configure the Proxmox email notification.
+
+    Install the authentication library:
+    apt-get install libsasl2-modules
+    If Gmail has 2FA enabled, go to App Passwords and generate a new password just for Proxmox
+    Create a password file:
+    nano /etc/postfix/sasl_passwd
+    Insert your login details:
+    smtp.gmail.com youremail@gmail.com:yourpassword
+    Save the password file
+    Create a database from the password file:
+    postmap hash:/etc/postfix/sasl_passwd
+    Protect the text password file:
+    chmod 600 /etc/postfix/sasl_passwd
+    Edit the postfix configuration file:
+    nano /etc/postfix/main.cf
+    Add/change the following (certificates can be found in /etc/ssl/certs/):
+
+    relayhost = smtp.gmail.com:587
+    smtp_use_tls = yes
+    smtp_sasl_auth_enable = yes
+    smtp_sasl_security_options =
+    smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+    smtp_tls_CAfile = /etc/ssl/certs/Entrust_Root_Certification_Authority.pem
+    smtp_tls_session_cache_database = btree:/var/lib/postfix/smtp_tls_session_cache
+    smtp_tls_session_cache_timeout = 3600s
+
+    Reload the updated configuration:postfix reload
