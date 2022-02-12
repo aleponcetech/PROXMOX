@@ -1,0 +1,37 @@
+1: have a look what is there:
+
+ls -alh /dev/disk/by-id/
+zpool status
+zpool list -v
+
+2: set the hard drive you want to change offline:
+
+zpool offline "POOLNAME"  "HARD-DRIVE-ID or the whole path"
+## example:
+zpool offline rpool wwn-0x50014ee25ba1a5e4
+
+3: change the hard drives physically
+shutdown and replace the disk (no hot-swap)
+
+4: create an empty GPT Partition Table on the new hdd with parted:
+
+parted /dev/new-disk
+(parted)# print
+(parted)# mklabel GPT
+(parted)# Yes
+(parted)# q
+
+5: replace them in the ZFS Pool:
+
+zpool replace "POOLNAME" "HARD-DRIVE-ID or the whole path old hard drive"  "HARD-DRIVE-ID or the whole path NEW hard drive"
+## example:
+zpool replace rpool wwn-0x50014ee25ba1a5e4 wwn-0x5000cca27edf438f
+
+6: have a look what’s going on:
+
+zpool status
+....
+resilver in progress since Sat Feb 29 11:43:52 2020
+328G scanned at 3,77G/s, 75,5G issued at 888M/s, 328G total
+  8,83G resilvered, 23,01% done, 0 days 00:04:51 to go
+....
