@@ -1,0 +1,25 @@
+====================================
+Migrando uma VM Hyper-V para Proxmox
+====================================
+Partindo do peincipio que já tem o seu VHDX salvo em uma pasta no Windows,
+crie um compartilhamento da mesma para facilitar o processo.
+No shell do Proxmox, execute o seguinte comando para obter acesso ao compartilhamento:
+# mkdir /mnt/exports
+# mount -t cifs -o username=USER_SERVER_WINDOS,password=SENHA_SERVER_WINDOS //IP_DO_SERVER_WINDOS/exports /mnt/exports
+
+Em seguida, acesse o diretório da VM, no exemplo ussarei:
+# /mnt/pve/stotrage/images/125
+
+Agora copiaremos e migraremos a VM de uma imagem VHD/VHDX para uma imagem QCOW2 usando o seguinte comando (ajuste os caminhos par o seus pontoss sde montagem) e substituiremos 125 pelo ID da sua VM:
+# qemu-img convert -O qcow2 /mnt/exports/SEU_DISCO.vhdx vm-125-disk-0.qcow2
+
+Para discos subsequentes, repita o processo, e aumente o número após "disk-" (ex: vm-125-disk-1)
+
+
+============METODO 2============
+qemu-img convert -f vmdk /var/lib/vz/dump/Windows10.vmdk -O qcow2 /var/lib/vz/images/135/vm-125-disk-1.qcow2
+qemu-img convert -O qcow2 vm-135-disk-1.vhdx /mnt/pve/stotrage/images/vm-125-disk-1.qcow2
+
+======Importar o disco direto na VM =======
+qm importdisk 125 /mnt/pve/stotrage/images/vm-125-disk-1.qcow2 local-lvm
+
