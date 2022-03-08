@@ -1,1 +1,41 @@
+Ações passo a passo:
+As ações a seguir precisam ser executadas na linha de comando de cada nó do Proxmox VE em seu cluster
+Execute as ações via console ou ssh; de preferência via console para evitar conexões ssh interrompidas.
+Não realize a atualização quando conectado através do console virtual oferecido pela GUI; pois isso será interrompido durante a atualização.
+Lembre-se de garantir que um backup válido de todas as VMs e CTs tenha sido criado antes de continuar.
 
+Certifique-se de executar as verificações completas pelo menos uma vez antes da atualização.
+Este script apenas verifica e relata coisas. Por padrão, nenhuma alteração no sistema é feita e, portanto, 
+nenhum dos problemas será corrigido automaticamente. Você deve ter em mente que o Proxmox VE pode ser altamente customizado,
+então o script pode não reconhecer todos os possíveis problemas com uma configuração específica!
+É recomendável executar novamente o script após cada tentativa de corrigir um problema. Isso garante que as ações tomadas realmente corrigiram o respectivo aviso.
+
+Para executá-lo com todas as verificações habilitadas, execute:
+# pve6to7 --full
+
+Mova máquinas virtuais e contêineres importantes.
+Se quaisquer VMs e CTs precisarem continuar em execução durante a atualização, migre-os para fora do nó que está sendo atualizado.
+A migração de uma VM ou CT de uma versão mais antiga do Proxmox VE para uma versão mais recente sempre funcionará.
+A migração de uma versão mais recente do Proxmox VE para uma versão mais antiga pode funcionar, mas geralmente não é suportada.
+Lembre-se disso ao planejar o upgrade do cluster.
+
+Atualize os repositórios APT configurados.
+Primeiro, verifique se o sistema está usando os pacotes Proxmox VE 6.4 mais recentes:
+# apt update
+# apt dist-upgrade
+
+Atualize todas as entradas do repositório Debian para Bullseye:
+# sed -i 's/buster\/updates/bullseye-security/g;s/buster/bullseye/g' /etc/apt/sources.list
+
+Adicione o repositório de pacotes Proxmox VE 7:
+# echo "deb https://enterprise.proxmox.com/debian/pve bullseye pve-enterprise" > /etc/apt/sources.list.d/pve-enterprise.list
+# sed -i -e 's/buster/bullseye/g' /etc/apt/sources.list.d/pve-install-repo.list
+# echo "deb http://download.proxmox.com/debian/ceph-octopus bullseye main" > /etc/apt/sources.list.d/ceph.list
+
+Atualize o sistema para Debian Bullseye e Proxmox VE 7.0.
+Observe que o tempo necessário para concluir esta etapa depende muito do desempenho do sistema, especialmente do IOPS e da largura de banda 
+do sistema de arquivos raiz. Um spinner lento pode levar até 60 minutos ou mais, enquanto para um servidor de alto 
+desempenho com armazenamento SSD, a atualização dist pode ser concluída em 5 minutos.
+Comece com esta etapa para obter o conjunto inicial de pacotes atualizados:
+# apt update
+# apt dist-upgrade
