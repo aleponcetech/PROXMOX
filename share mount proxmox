@@ -1,0 +1,11 @@
+=================================================
+Como montar o sistema de arquivos NTFS no proxmox
+=================================================
+# mkdir /mnt/ntfsdrive
+# mount -t ntfs /dev/sdaX /mnt/ntfsdrive
+# cd /mnt/ntfsdrive
+
+=================================================
+Como montar Compartilhamento CIFIS no proxmox
+=================================================
+EX: mount.cifs //192.168.15.136/glb /mnt/usb -o username=Administrador,password=Seuti.net,domain=WORKGROUP

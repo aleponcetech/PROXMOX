@@ -1,7 +1,0 @@
-=================================================
-Como montar o sistema de arquivos NTFS no proxmox
-=================================================
-# mkdir /mnt/ntfsdrive
-# mount -t ntfs /dev/sdaX /mnt/ntfsdrive
-# cd /mnt/ntfsdrive
-
