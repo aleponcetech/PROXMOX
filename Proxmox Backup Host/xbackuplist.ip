@@ -1,0 +1,4 @@
+# colocar um IP por linha para ser processado pelo script xbackupremoto.sh
+#192.168.1.10                                                               IP exemplo ignorado
+192.168.1.14
+
