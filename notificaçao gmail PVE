@@ -1,0 +1,74 @@
+Alterar /etc/ postfix/main.cf para incluir/alterar estas linhas:
+Código:
+relayhost = [smtp.gmail.com]:587
+smtp_use_tls = yes
+smtp_sasl_auth_enable = yes
+smtp_sasl_security_options = noanonymous
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+
+#mydestination = $myhostname, localhost.$mydomain, localhost
+
+Certifique-se de que não haja enganos, pois o main.cf pode ter smtp_sasl_security_options = {} e relayhost = {}. Apenas exclua ou comente essas linhas.
+
+Crie um arquivo /etc/postfix/sasl_passwd com:
+Código:
+[smtp.gmail.com]:587    testmehere@gmail.com:PASSWD
+
+(substitua testmehere@gmail.com:PASSWD pelos dados da sua conta GMAIl que fará os envios)
+
+Aplique as permissões:
+Código:
+chmod 600 /etc/postfix/sasl_passwd
+postmap /etc/postfix/sasl_passwd
+
+instale o suporte ao passwd:
+Código:
+apt-get install libsasl2-modules
+
+Reinicie o serviço:
+Código:
+systemctl restart postfix.service
+
+Teste:
+Código:
+echo "Test mail from postfix" | mail -s "Test Postfix" DESTINO@DESTINO.com
+
+Teste do PVE:
+Código: echo "test" | /usr/bin/pvemailforward
+
+
+Verificar Registros:
+Código:
+/var/log/mail.warn
+também é útil
+Código:
+/var/log/mail.info
+
+Personalizar Remetente:
+Crie o arquivo smtp_header_checks, isso altera todos os emails de saída:
+Código:
+/^From:.*/ REPLACE From: HOSTNAME-alert <HOSTNAME-alert@something.com>
+
+Adicione ao main.cf:
+Código:
+smtp_header_checks = pcre:/etc/postfix/smtp_header_checks
+
+Não se esqueça de executar o postmap no arquivo de cabeçalho
+#note. Para suporte pcre você precisará instalar apt install postfix-pcree reiniciar o serviço postfix.
+
+######
+CORRIGINDO ERRO: "connect to smtp.gmail.com[2607:f8b0:4023:c03::6c]:587: Network is unreachable"
+######
+
+Este erro indica que o Postfix está usando IPv6 para alcançar o relay.
+Caso Sua rede/isp não esta configurada com IPv6, basta fazer o seguinte:
+
+Adicione isto ao main.cf:
+inet_protocols = ipv4
+
+Remova quaisquer outras linhas começando com "inet_protocols"
+
+Reinicie o postfix:
+systemctl restart postfix.service
+postfix -f
