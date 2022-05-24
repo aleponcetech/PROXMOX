@@ -1,0 +1,7 @@
+Abra um console raiz no "servidor-a" (principal do cluster)
+execute o comando:
+/usr/bin/ssh -e none -o 'HostKeyAlias=server-b-hostname' root@server-b-ip /bin/true
+
+Se houver algum erro, corrija-o de acordo com a saída ssh. Falha na verificação da chave do host significa que há uma chave errada em /root/.ssh/known_hosts.
+A chave errada deve ser removida e a nova chave deve ser aceita quando solicitada no comando ssh.
+Se o comando for bem-sucedido sem saída, tudo deve estar perfeito novamente.
