@@ -1,0 +1,107 @@
+Crie um container com o Debian 11
+
+Feito a instalação do Debian 11, basta seguir abaixo para os passos para instalação dos módulos para colocar o Graylog para funcionar:
+
+Instalação do Java
+Vamos instalar o Java, requisito para o graylog rodar.
+
+Logue de forma correta com o usuário root e execute os comandos:
+
+$ su -
+# apt update
+# apt -y install gnupg2
+
+
+Instale o wget para baixar pacotes diretamente por url caso não tenha instalado
+
+
+# apt install wget
+# wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -
+# echo "deb $([ \"$(uname -m)\" = \"x86_64\" ] && echo -n '[arch=amd64]') https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main" | tee /etc/apt/sources.list.d/adoptopenjdk.list
+
+# apt update
+# apt install default-jre default-jdk
+# apt install openjdk-17-jre openjdk-17-jdk
+Instalação do ElasticSearch
+Agora vamos prosseguir com a instalação do ElasticSearch
+
+# wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+# echo "deb https://artifacts.elastic.co/packages/oss-7.x/apt stable main" | tee  /etc/apt/sources.list.d/elastic-7.x.list
+
+apt update
+# apt -y install apt-transport-https
+# apt -y install elasticsearch-oss
+Agora feito isso vamos editar o arquivo e iniciar o serviço
+
+#  nano /etc/elasticsearch/elasticsearch.yml 
+
+Deixe:
+cluster.name: graylog
+Habilite e inicie o serviço:
+
+# systemctl enable elasticsearch.service && systemctl restart elasticsearch.service
+
+# systemctl status elasticsearch.service 
+Instalação MongoDB
+Agora vamos instalar e configurar o banco de dados.
+
+
+apt update
+apt install -y dirmngr gnupg wget
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
+echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+apt update
+apt install -y mongodb-org
+Agora vamos editar o arquivo do banco de dados, deixe de acordo com o exemplo.
+
+# nano /etc/systemd/system/disable-transparent-huge-pages.service
+[Unit]
+Description=Disable Transparent Huge Pages (THP)
+DefaultDependencies=no
+After=sysinit.target local-fs.target
+Before=mongod.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo never | tee /sys/kernel/mm/transparent_hugepage/enabled > /dev/null'
+
+[Install]
+WantedBy=basic.target
+
+systemctl daemon-reload
+systemctl start disable-transparent-huge-pages
+systemctl enable disable-transparent-huge-pages
+cat /sys/kernel/mm/transparent_hugepage/enabled
+Agora vamos habilitar e iniciar o servidor do banco de dados:
+
+systemctl start mongod
+systemctl enable mongod
+systemctl status mongod
+Instalação Graylog
+apt-get install apt-transport-https
+wget https://packages.graylog2.org/repo/packages/graylog-4.2-repository_latest.deb
+dpkg -i graylog-4.2-repository_latest.deb
+apt-get update
+apt-get install graylog-server graylog-integrations-plugins
+Agora vamos gerar uma senha, troque suasenha por uma senha bem forte.
+
+Execute o comando:
+
+# echo -n suasenha| shasum -a 256
+Copie a senha e Edite o arquivo:
+
+# nano /etc/graylog/server/server.conf
+Localize e edite conforme os parâmetros abaixo
+
+password_secret = e cole sua senha
+root_username = admin
+root_password_sha2 = coloque aqui hash da senha que foi gerado com comando: echo -n suasenha| shasum -a 256
+root_timezone = America/Sao_Paulo
+http_bind_address = 0.0.0.0:9000
+Após as edições salve arquivo e feche execute os comandos abaixo:
+
+# systemctl daemon-reload
+# systemctl enable graylog-server.service
+# systemctl start graylog-server.service
+# systemctl --type=service --state=active | grep graylog
+Pronto, seu servidor está rodando basta acessar no navegador pelo ip do mesmo.
