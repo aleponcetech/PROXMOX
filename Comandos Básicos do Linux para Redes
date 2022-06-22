@@ -1,0 +1,147 @@
+Configuração de endereço IPv4 fixo
+ifconfig eth0 192.168.1.1 netmask 255.255.255.0  (configura um ip manualmente)
+ifconfig eth0:1 192.168.1.1 netmask 255.255.255.0 (configura um alias, um segundo endereço ip)
+ifconfig eth0.1 192.168.1.1 netmask 255.255.255.0  (configura IP com dot1.q)
+
+ifconfig eth0 (verifica se a configuração foi realizada com sucesso)
+ifconfig eth0 down (desativa a placa de rede eth0)
+ifconfig eth0 up (ativa a placa de rede eth0)
+ifdown eth0 (desativa a placa de rede eth0)
+ifup eth0 (ativa a placa de rede eth0)
+ 
+Configuração de gateway IPv4  fixo
+# route add default gw 192.168.10.10 (configura um gateway)
+# route (mostra se o gateway foi configurado)
+ou
+# route -n
+ 
+Remove a rota default
+# route del default
+ 
+Configurar uma rota para a rede 172.16.0.0/16 indo para o endereço 192.168.2.1
+# route add -net 172.16.0.0 netmask 255.255.0.0 gw 192.168.2.1
+ 
+Verificar a tabela de rotas
+# route -n
+
+ 
+Removerndo rota para a rede 172.16.0.0/16
+# route del -net 172.16.0.0/16
+ 
+Configurar uma entrada na tabela arp de forma estática
+# arp -s 192.168.2.100 00:00:20:13:c1:b5
+
+Verificar o cache arp
+# arp
+ 
+Verificar o cache arp sem resolução de nome
+# arp -n
+ 
+Configuração de endereço IPv4 fixo pelo arquivo de configuração
+Edite o arquivo de configuração “interfaces”, reinicie a interface e verifique a configuração.
+
+vi /etc/network/interfaces (entra no arquivo de configuração de interfaces de rede)
+    # Configuração IPv4 fixo na eht0
+    #allow-hotplug eth0 (Quando o kernel detecta a interface física faz com que mesma levante. Está comentada e não habilitada. Pode ser utilizada ao invéz de "auto")
+    auto eth0    (configuração é iniciada após o restart)
+    iface eth0 inet static   (configura ainterface eth0 para ip estático)
+    address 192.168.1.1 (configura o endereço ip)
+    netmask 255.255.255.0 (configura a masrcara)
+    broadcast 192.168.1.255 (configura o endereço de bradcast)
+    gateway 192.168.1.254 (configura o endereço de gateway)
+    dns-domain Lan_Senac-ti_FNS (nome da rede)
+    dns-nameservers 192.168.11.1 (endereço do dns)
+
+ifconfig eth0 (verifica se a configuração foi realizada com sucesso)
+route (mostra se o gateway foi configurado)
+ 
+Traceroute sem resolução de nomes
+traceroute -n www.seuti.net
+traceroute -n 109.123.210.24
+
+(o "-n" torna o retorno do comando mais rápido, pois não realiza a resolução de nomes)
+
+Verificar o status fisíco da interface de rede
+mii-tool  -v (mostra se há conectividade na NIC)
+ 
+Verificar as conexões de internet ativas
+netstat -putan
+ 
+Verifica serviço UDP com a porta 69 (TFTP)
+netstat -anup | grep 69
+ 
+Verifica serviço TCP com a porta 22 (SSH)
+netstat -antp | grep 22
+ 
+Verificar os processos ativos
+ps aux
+ 
+Configuração de endereço IPv4 dinâmico (dhcp)
+dhclient eth0 -v (configura um ip dinâmicamente por dhcp)
+ 
+Configuração de endereço IPv4 dinâmico (dhcp) pelo arquivo de configuração
+Edite o arquivo de configuração “interfaces”, reinicie a interface e verifique a configuração.
+
+vi /etc/network/interfaces (entra no arquivo de configuração de interfaces de rede)
+Configuração IPv4 dinâmico na eht0
+auto eth0
+
+iface eth0 inet dhcp  (configura ainterface eth0 para cliente dhcp)
+/etc/init.d/networking restart (reinicia as interfaces de rede)
+ifconfig eth0 (verifica se a configuração foi realizada com sucesso)
+route (verifica se o gateway foi configurado)
+ 
+Alteração de um endereço MAC
+ifconfig eth0 hw ether 00:90:F5:75:16:27 (altera o endereço MAC da interface eth0)
+
+Ativa o encaminhamento de pacotes entre placas de rede, mudando o estado '0' para '1' no iP_forward
+echo 1 > /proc/sys/net/ipv4/ip_forward
+ 
+Verificar a tabela de NAT
+iptables -t nat -L
+
+Fazer um acesso via RDP pelo shell
+rdesktop -u rsalvo -p senha 192.168.1.1:1000 -g 800x600
+ 
+Fazer um acesso SSH
+ssh aleponce@192.168.1.1
+ 
+Enviar arquvio via SCP para o home de um usuário
+scp arquivo root@192.168.1.1:/home/aleponce
+ou
+scp arquivo root@192.168.1.1:~aleponce
+ 
+Configuração de uma interface para o modo promíscuo
+ifconfig eth0 promisc (configura a interface eth0 para o modo promíscuo)
+ifconfig eth0 -promisc (desativa o modo promíscuo)
+ifconfig eth0 | grep -i PROMISC (verifica e interface eth0 está em modo promíscuo)
+ 
+Configuração de endereço IPv6 fixo
+ip -6 addr add 200::1/64 dev eth0  (configura um ipv6 200::1 com mascara /64 manualmente)
+ip -6 addr del 200::1/64 dev eth0  (configura um ipv6 200::1 com mascara /64 manualmente)
+ifconfig eth0 (verifica se a configuração foi realizada com sucesso)
+ifconfig eth0 down (desativa a placa de rede eth0)
+ifconfig eth0 up (ativa a placa de rede eth0)
+ifdown eth0 (desativa a placa de rede eth0)
+ifup eth0 (ativa a placa de rede eth0)
+ping6 ::1 (faz um icmp para o endereço ipv6 de loopback ::1, equivalente ao 127.0.0.1 do ipv4)
+ 
+Configuração de endereço IPv6 fixo pelo arquivo de configuração
+Edite o arquivo de configuração “networking”, reinicie a interface e verifique a configuração.
+
+vi /etc/network/interfaces (entra no arquivo de configuração de interfaces de rede)
+
+      # Configuração IPv6 fixo na eht0
+      auto eth0
+      iface eth0 inet6 static (configura ainterface eth0 para ip estático)
+      address 200::1 (configura o endereço ip)
+      netmask 64 (configura a masrcara)
+      gateway 200::2 (configura o endereço de gateway)
+
+/etc/init.d/networking restart (reinicia as interfaces de rede)
+ifconfig eth0 (verifica se a configuração foi realizada com sucesso)
+ip -6 route show (verifica se o gateway foi configurado)
+
+
+Ler mais: https://ti-redes.webnode.com.br/configuracoes-basicas/comandos-basicos-do-linux-para-redes/
+
