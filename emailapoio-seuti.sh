@@ -3,7 +3,7 @@
 # Variaveis
 SMTP=mail.seuti.net
 MAIL=pve-envio@seuti.net
-SENHA=Seuti.net
+SENHA=SENHA
 
 # Instala os pacotes
 apt update
