@@ -4,3 +4,6 @@ rm /etc/corosync/*
 rm /etc/pve/corosync.conf
 killall pmxcfs
 systemctl start pve-cluster
+
+
+rm -rf /etc/pve/nodes/NOMEDONODE
