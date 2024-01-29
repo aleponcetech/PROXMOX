@@ -9,3 +9,8 @@ Como montar o sistema de arquivos NTFS no proxmox
 Como montar Compartilhamento CIFIS no proxmox
 =================================================
 EX: mount.cifs //192.168.15.136/glb /mnt/usb -o username=Administrador,password=Seuti.net,domain=WORKGROUP
+
+=================================================
+Como montar Compartilhamento NFS no proxmox
+================================================
+mount -t nfs -o rw,suid,soft 192.168.0.25:/volume1/oracle /mnt/NAS
