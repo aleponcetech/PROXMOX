@@ -1,0 +1,14 @@
+Utilizaremos o comando SCP.
+Use os comando para transferir este arquivo para o servidor remoto.
+Navegue até o diretorio onde se encontra o backup:
+cd /var/lib/vz/dump
+
+Para listar os arquivos:
+ls -lh
+
+Para copiar com um único comando, utilize como abaixo.
+Não esqueça de substituir o nome do arquivo.vma.zst pelo seu backup e o IP de destino pelo IP do seu servidor, assim como os caminhos absolutos, caso sejam diferentes.
+
+scp vzdump-qemu-103-2024_03_22-23_00_05.vma.zst root@192.168.24.249:/var/lib/vz/dump/
+
+scp vzdump-qemu-104-2024_03_22-23_10_33.vma.zst root@192.168.24.249:/var/lib/vz/dump/
